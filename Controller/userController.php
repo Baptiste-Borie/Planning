@@ -4,12 +4,17 @@ class UserController
     private $userManager;
     private $db;
 
+    private $eventCollection;
+
+
+
     public function __construct($db)
     {
         require_once('./Model/User.php');
         require_once('./Model/UserManager.php');
         $this->userManager = new UserManager($db);
         $this->db = $db;
+        $this->eventCollection = "Planning.event";
     }
 
     public function home(): void
@@ -140,5 +145,22 @@ class UserController
         } else {
             echo "ID invalide ou non défini.";
         }
+    }
+
+    public function planning()
+    {
+        // Requête pour récupérer tous les événements
+        $query = new MongoDB\Driver\Query([]); // Filtre vide pour récupérer tout
+        $cursor = $this->db->executeQuery($this->eventCollection, $query);
+
+        // Convertir les événements en tableau PHP
+        $events = [];
+        foreach ($cursor as $event) {
+            $events[] = $event;
+        }
+
+        $userManager = $this->userManager;
+        $page = "planning";
+        require('./View/default.php');
     }
 }

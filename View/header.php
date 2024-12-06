@@ -29,5 +29,8 @@
         <a href="./index.php?ctrl=user&action=usersList" class="no-deco">
             <li>Liste des utilisateurs</li>
         </a>
+        <a href="./index.php?ctrl=user&action=planning" class="no-deco">
+            <li> Planning</li>
+        </a>
     </ul>
 </header>

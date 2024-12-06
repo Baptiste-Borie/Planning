@@ -14,7 +14,6 @@
 </head>
 
 <?php
-$EVENT_COLLECTION = "Planning.event";
 $USERS_COLLECTION = "Planning.users";
 
 session_start();
