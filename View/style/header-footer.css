@@ -1,0 +1,129 @@
+/* Header */
+header {
+    position: relative;
+    height: 130px;
+    margin-bottom: 50px;
+    padding: 0 50px;
+    padding-bottom: 20px;
+    box-shadow: 0 3px 14px -7px gray;
+}
+
+header #banner-bloc {
+    margin: auto;
+    height: 100px;
+    text-align: center;
+}
+
+header .banner {
+    height: 200px;
+}
+
+header #banner-bloc h1 {
+    position: relative;
+    text-shadow: 0px 0px 3px #fff;
+}
+
+/* Info bar */
+#info-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 25px;
+    padding-top: 0;
+    height: 150px;
+    width: 30%;
+    color: #2e6e3f;
+    text-shadow: 0 0 5px rgba(68, 68, 68, 0.3);
+    font-family: 'Nunito', sans-serif;
+}
+
+@media screen and (max-width: 600px) {
+    #info-bar {
+        padding-left: 5px;
+        width: 20%;
+    }
+}
+
+/* Account bar */
+#account_bar {
+    display: flex;
+    justify-content: flex-end;
+    flex-flow: row wrap;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 25px;
+    height: 150px;
+    width: 30%;
+}
+
+#account_bar>div {
+    margin: 0 30px;
+}
+
+#account_bar>div svg {
+    font-size: 2em;
+}
+
+#account_bar a:hover .text {
+    color: #66AD66;
+    transition: 0.2s ease-in-out;
+}
+
+#account_bar .nb-items {
+    position: absolute;
+    margin-left: 35px;
+    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: #66AD66;
+    border-radius: 50%;
+}
+
+@media screen and (max-width: 600px) {
+    #account_bar>div {
+        margin: 0 5px;
+    }
+}
+
+
+/* Menu bar */
+#menu_bar {
+    display: flex;
+    justify-content: space-around;
+    flex-flow: row wrap;
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+#menu_bar li {
+    display: inline-block;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 1.2em;
+    color: #000;
+    border-bottom: 3px groove #7fd780;
+}
+
+#menu_bar li:hover {
+    border-bottom: 3px solid #66AD66;
+}
+
+/* Footer */
+footer {
+    position: relative;
+    height: 50px;
+    margin-top: 50px;
+    padding: 0 50px;
+    padding-top: 20px;
+    text-align: center;
+    box-shadow: 0 -18px 10px -19px gray;
+}
+
+footer>p {
+    margin-top: 5px;
+}

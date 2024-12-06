@@ -1,7 +1,7 @@
 <?php
 class User
 {
-    private int $id;
+    private ?string $id;
     private string $email;
     private string $password;
     private string $firstName;
@@ -14,7 +14,7 @@ class User
     }
 
     // Getters
-    public function getId(): int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -38,43 +38,44 @@ class User
     {
         return $this->lastName;
     }
+
     public function getAdmin(): bool
     {
         return $this->admin;
     }
 
     // Setters
-    public function setId($id): static
+    public function setId(?string $id): static
     {
         $this->id = $id;
         return $this;
     }
 
-    public function setEmail($email): static
+    public function setEmail(string $email): static
     {
         $this->email = $email;
         return $this;
     }
 
-    public function setPassword($password): static
+    public function setPassword(string $password): static
     {
         $this->password = $password;
         return $this;
     }
 
-    public function setFirstName($firstName): static
+    public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
         return $this;
     }
 
-    public function setLastName($lastName): static
+    public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
         return $this;
     }
 
-    public function setAdmin($admin): static
+    public function setAdmin(bool $admin): static
     {
         $this->admin = $admin;
         return $this;
@@ -82,10 +83,16 @@ class User
 
     public function hydrate(array $data): void
     {
-        foreach ($data as $key => $donnee) {
+
+        if (isset($data['_id'])) {
+            $data['id'] = $data['_id'];
+            unset($data['_id']);
+        }
+
+        foreach ($data as $key => $value) {
             $method = 'set' . ucfirst($key);
             if (method_exists($this, $method)) {
-                $this->$method($donnee);
+                $this->$method($value);
             }
         }
     }

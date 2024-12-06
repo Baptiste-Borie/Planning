@@ -2,45 +2,55 @@
 
 class UserManager
 {
-    private PDO $db;
-    private String $table;
-    public function __construct(PDO $db)
+    private MongoDB\Driver\Manager $manager;
+    private string $collection;
+
+    public function __construct(MongoDB\Driver\Manager $manager, string $database = "Planning", string $collection = "users")
     {
-        $this->db = $db;
-        $this->table = "users";
+        $this->manager = $manager;
+        $this->collection = "$database.$collection"; // Nom complet de la collection
     }
+
     public function create(User $user): void
     {
         $hashedPassword = password_hash($user->getPassword(), PASSWORD_BCRYPT);
 
-        $req = $this->db->prepare("INSERT INTO $this->table(password, email, firstName, lastName, address, postalCode, city, admin) VALUES(:password, :email, :firstname, :lastname, :address, :postalCode, :city, :admin)");
-        $req->bindValue(':email', $user->getEmail());
-        $req->bindValue(':password', $hashedPassword);
-        $req->bindValue(':firstname', $user->getFirstName());
-        $req->bindValue(':lastname', $user->getLastName());
-        $req->bindValue(':admin', 0);
-        $req->execute();
+        $document = [
+            'email' => $user->getEmail(),
+            'password' => $hashedPassword,
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'admin' => true,
+        ];
+
+        $bulk = new MongoDB\Driver\BulkWrite();
+        $bulk->insert($document);
+
+        $this->manager->executeBulkWrite($this->collection, $bulk);
     }
 
     public function findAll(): array
     {
+        $query = new MongoDB\Driver\Query([]);
+        $cursor = $this->manager->executeQuery($this->collection, $query);
+
         $users = [];
-        $req = $this->db->query("SELECT * FROM users ORDER BY id");
-        while ($donnees = $req->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = new User($donnees);
+        foreach ($cursor as $document) {
+            $users[] = new User((array)$document);
         }
+
         return $users;
     }
-    public function findOne(int $id): User
+
+    public function findOne(string $id): ?User
     {
-        $req = $this->db->prepare("SELECT * FROM users WHERE id = :id");
-        $req->bindValue(':id', $id, PDO::PARAM_INT);
-        $req->execute();
+        $filter = ['_id' => new MongoDB\BSON\ObjectId($id)];
+        $query = new MongoDB\Driver\Query($filter);
+        $cursor = $this->manager->executeQuery($this->collection, $query);
+        $document = current($cursor->toArray());
 
-        $donnees = $req->fetch(PDO::FETCH_ASSOC);
-
-        if ($donnees) {
-            return new User($donnees);
+        if ($document) {
+            return new User((array)$document);
         } else {
             throw new Exception("User not found");
         }
@@ -50,72 +60,58 @@ class UserManager
     {
         $hashedPassword = password_hash($user->getPassword(), PASSWORD_BCRYPT);
 
-        $req = $this->db->prepare("UPDATE users SET 
-                email = :email,
-                lastName = :lastName,
-                firstName = :firstName,
-                address = :address,
-                postalCode = :postalCode,
-                city = :city,
-                password = :password,
-                admin = :admin
-                WHERE id = :id
-            ");
+        $filter = ['_id' => new MongoDB\BSON\ObjectId($user->getId())];
+        $update = [
+            '$set' => [
+                'email' => $user->getEmail(),
+                'firstName' => $user->getFirstName(),
+                'lastName' => $user->getLastName(),
+                'password' => $hashedPassword,
+                'admin' => $user->getAdmin(),
+            ],
+        ];
 
-        $req->bindValue(':password', $hashedPassword);
-        $req->bindValue(':email', $user->getEmail());
-        $req->bindValue(':firstName', $user->getFirstName());
-        $req->bindValue(':lastName', $user->getLastName());
-        $req->bindValue(':admin', $user->getAdmin(), PDO::PARAM_BOOL);
-        $req->bindValue(':id', $user->getId(), PDO::PARAM_INT);
+        $bulk = new MongoDB\Driver\BulkWrite();
+        $bulk->update($filter, $update);
 
-        $req->execute();
+        $this->manager->executeBulkWrite($this->collection, $bulk);
     }
 
-    public function updateNoPassword(User $user)
+    public function updateNoPassword(User $user): void
     {
+        $filter = ['_id' => new MongoDB\BSON\ObjectId($user->getId())];
+        $update = [
+            '$set' => [
+                'email' => $user->getEmail(),
+                'firstName' => $user->getFirstName(),
+                'lastName' => $user->getLastName(),
+                'admin' => $user->getAdmin(),
+            ],
+        ];
 
-        $req = $this->db->prepare("UPDATE users SET 
-                    email = :email,
-                    lastName = :lastName,
-                    firstName = :firstName,
-                    address = :address,
-                    postalCode = :postalCode,
-                    city = :city,
-                    admin = :admin
-                    WHERE id = :id
-                ");
+        $bulk = new MongoDB\Driver\BulkWrite();
+        $bulk->update($filter, $update);
 
-        $req->bindValue(':email', $user->getEmail());
-        $req->bindValue(':firstName', $user->getFirstName());
-        $req->bindValue(':lastName', $user->getLastName());
-        $req->bindValue(':admin', $user->getAdmin(), PDO::PARAM_BOOL);
-        $req->bindValue(':id', $user->getId(), PDO::PARAM_INT);
-
-        $req->execute();
+        $this->manager->executeBulkWrite($this->collection, $bulk);
     }
-
-
 
     public function delete(User $user): void
     {
-        $req = $this->db->prepare("DELETE FROM users WHERE id = :id");
-        $req->bindValue(':id', $user->getId(), PDO::PARAM_INT);
-        $req->execute();
+        $filter = ['_id' => new MongoDB\BSON\ObjectId($user->getId())];
+
+        $bulk = new MongoDB\Driver\BulkWrite();
+        $bulk->delete($filter);
+
+        $this->manager->executeBulkWrite($this->collection, $bulk);
     }
 
     public function findByEmail(string $email): ?User
     {
-        $req = $this->db->prepare("SELECT * FROM $this->table WHERE email = :email");
-        $req->bindValue(':email', $email, PDO::PARAM_STR);
-        $req->execute();
+        $filter = ['email' => $email];
+        $query = new MongoDB\Driver\Query($filter);
+        $cursor = $this->manager->executeQuery($this->collection, $query);
+        $document = current($cursor->toArray());
 
-        $donnees = $req->fetch(PDO::FETCH_ASSOC);
-
-        if ($donnees) {
-            return new User($donnees);
-        } else {
-            return null; // Retourne null si aucun utilisateur n'est trouvé
-        }
+        return $document ? new User((array)$document) : null;
     }
 }

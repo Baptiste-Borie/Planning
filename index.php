@@ -3,6 +3,9 @@
     <title>Planning</title>
     <meta name="viewport" content="width=device-width">
     <!-- Font -->
+    <link href="View/style/general.css" rel="stylesheet" type="text/css">
+    <link href="View/style/header-footer.css" rel="stylesheet" type="text/css">
+    <link href="View/style/mainSection.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Nunito|Glegoo" rel="stylesheet">
     <!-- Fontawesome -->
     <script src="./View/js/fontawesome-all.min.js"></script>
@@ -11,10 +14,17 @@
 </head>
 
 <?php
+$EVENT_COLLECTION = "Planning.event";
+$USERS_COLLECTION = "Planning.users";
+
 session_start();
 require_once('./Model/Connection.php');
-$pdoBuilder = new Connection();
-$db = $pdoBuilder->getDb();
+$connection = new Connection();
+$manager = $connection->getManager();
+
+// Requête pour récupérer les documents d'une collection
+$query = new MongoDB\Driver\Query([]); // Filtre vide pour récupérer tout
+$cursor = $manager->executeQuery($USERS_COLLECTION, $query);
 
 // Gestion des contrôleurs et des actions
 if (
@@ -31,5 +41,5 @@ if (
 
 require_once('./Controller/' . $ctrl . 'Controller.php');
 $ctrl = $ctrl . 'Controller';
-$controller = new $ctrl($db);
+$controller = new $ctrl($manager);
 $controller->$action();
