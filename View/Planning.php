@@ -24,7 +24,6 @@
                             <option value="<?= htmlspecialchars($user->getId()) ?>">
                                 <?= htmlspecialchars($user->getLastName()) ?>
                             </option>
-                            <!-- Vous pouvez ajouter d'autres options ici -->
                         </select>
                     </td>
                 </tr>
