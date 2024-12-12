@@ -12,7 +12,6 @@
                 $id = $event["user_id"];
                 $user = $id ? $userManager->findOne($id) : null;
 
-                // Calculer le premier jour de la semaine
                 $weekNumber = $event['weekNumber'] ?? null;
                 $year = $event['year'] ?? null;
 
