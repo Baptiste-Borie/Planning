@@ -3,7 +3,7 @@ class UserController
 {
     private $userManager;
     private $db;
-
+    private $eventManager;
     private $eventCollection;
 
 
@@ -12,7 +12,10 @@ class UserController
     {
         require_once('./Model/User.php');
         require_once('./Model/UserManager.php');
+        require_once('./Model/Event.php');
+        require_once('./Controller/eventManager.php');
         $this->userManager = new UserManager($db);
+        $this->eventManager = new EventManager($db);
         $this->db = $db;
         $this->eventCollection = "Planning.event";
     }
@@ -116,9 +119,6 @@ class UserController
 
         $user = $this->userManager->findOne($id);
 
-        /*        $user->getEmail() = $email;
-        $user->getLastName() = $lastName;
-        $user->getFirstName() = $firstName; */
         $user->setEmail($email);
         $user->setLastName($lastName);
         $user->setFirstName($firstName);
@@ -160,15 +160,8 @@ class UserController
 
     public function planning()
     {
-        // Requête pour récupérer tous les événements
-        $query = new MongoDB\Driver\Query([]); // Filtre vide pour récupérer tout
-        $cursor = $this->db->executeQuery($this->eventCollection, $query);
-
-        // Convertir les événements en tableau PHP
-        $events = [];
-        foreach ($cursor as $event) {
-            $events[] = $event;
-        }
+        $events = $this->eventManager->getEvents();
+        $this->eventManager->checkEventYear($events);
 
         $userManager = $this->userManager;
         $page = "planning";
