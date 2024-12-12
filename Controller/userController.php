@@ -42,7 +42,6 @@ class UserController
         $password = $_POST['password'];
 
         $result = $this->userManager->findByEmail($email);
-        var_dump($result);
 
         if ($result && password_verify($password, $result->getPassword())) {
             $info = "Connexion réussie";
@@ -139,9 +138,21 @@ class UserController
     {
         if (isset($_GET['id']) && !empty($_GET['id'])) {
             $id = $_GET['id'];
-            $this->userManager->delete($id);
-            header('Location: ./index.php?ctrl=user&action=usersList');
-            exit();
+
+            if ($_SESSION['user_id'] === $id) {
+                echo "Erreur : Vous ne pouvez pas supprimer votre propre compte.";
+                return;
+            }
+
+            try {
+                $user = $this->userManager->findOne($id);
+                $this->userManager->delete($user);
+
+                header('Location: ./index.php?ctrl=user&action=usersList');
+                exit();
+            } catch (Exception $e) {
+                echo "Erreur : " . $e->getMessage();
+            }
         } else {
             echo "ID invalide ou non défini.";
         }

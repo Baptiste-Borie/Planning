@@ -21,12 +21,13 @@
                         <td><?= htmlspecialchars($user->getLastName()) ?></td>
                         <td><?= $user->getAdmin() ? '1' : '0' ?></td>
                         <td>
-                            <!-- Bouton Modifier -->
                             <a href="./index.php?ctrl=user&action=modif&id=<?= $user->getId() ?>" class="btn btn-edit">Modifier</a>
-                            <!-- Bouton Supprimer -->
-                            <a href="./index.php?ctrl=user&action=suppress&id=<?= $user->getId() ?>"
-                                class="btn btn-delete"
-                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">Supprimer</a>
+                            <?php if ($_SESSION['user_id'] !== $user->getId()): // Empêche d'afficher le bouton Supprimer pour l'utilisateur connecté 
+                            ?>
+                                <a href="./index.php?ctrl=user&action=suppress&id=<?= $user->getId() ?>"
+                                    class="btn btn-delete"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">Supprimer</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
