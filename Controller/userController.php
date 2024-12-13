@@ -160,14 +160,24 @@ class UserController
 
     public function planning()
     {
+        $selectedYear = $_GET['year'] ?? null;
+
         $events = $this->eventManager->getEvents();
+
+        $availableYears = array_unique(array_column($events, 'year'));
+        sort($availableYears);
+
+        if ($selectedYear) {
+            $events = array_filter($events, fn($event) => $event['year'] == $selectedYear);
+        }
+
         $this->eventManager->checkEventYear($events);
         $users = $this->userManager->findAll();
 
-        $userManager = $this->userManager;
         $page = "planning";
         require('./View/default.php');
     }
+
 
     public function updateEvent()
     {

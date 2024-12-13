@@ -1,3 +1,18 @@
+<form method="GET" action="index.php">
+    <input type="hidden" name="ctrl" value="user">
+    <input type="hidden" name="action" value="planning">
+    <label for="year">Sélectionner une année :</label>
+    <select name="year" id="year" onchange="this.form.submit()">
+        <option value="">Toutes les années</option>
+        <?php foreach ($availableYears as $availableYear): ?>
+            <option value="<?= htmlspecialchars($availableYear) ?>"
+                <?= $selectedYear == $availableYear ? 'selected' : '' ?>>
+                <?= htmlspecialchars($availableYear) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</form>
+
 <form method="POST" action="index.php?ctrl=user&action=updateEvent">
     <table border="1" class="events-table">
         <thead>
@@ -22,17 +37,11 @@
                 }
             ?>
                 <tr>
-                    <td>
-                        <?= htmlspecialchars($startDate) ?>
-                    </td>
-                    <td>
-                        <?= htmlspecialchars($event["year"] ?? 'Non spécifiée') ?>
-                    </td>
+                    <td><?= htmlspecialchars($startDate) ?></td>
+                    <td><?= htmlspecialchars($year ?? 'Non spécifiée') ?></td>
                     <td>
                         <select name="user_<?= htmlspecialchars($event["_id"]) ?>">
-                            <option value="" <?= $id === null ? 'selected' : '' ?>>
-                                Aucun utilisateur
-                            </option>
+                            <option value="" <?= $id === null ? 'selected' : '' ?>>Aucun utilisateur</option>
                             <?php foreach ($users as $user): ?>
                                 <option value="<?= htmlspecialchars($user->getId()) ?>"
                                     <?= (string)$user->getId() === (string)$id ? 'selected' : '' ?>>
