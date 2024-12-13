@@ -162,9 +162,27 @@ class UserController
     {
         $events = $this->eventManager->getEvents();
         $this->eventManager->checkEventYear($events);
+        $users = $this->userManager->findAll();
 
         $userManager = $this->userManager;
         $page = "planning";
         require('./View/default.php');
+    }
+
+    public function updateEvent()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            foreach ($_POST as $key => $value) {
+                if (str_starts_with($key, 'user_')) {
+                    $eventId = str_replace('user_', '', $key);
+                    $userId = !empty($value) ? $value : null;
+
+                    $this->eventManager->updateEventUser($eventId, $userId);
+                }
+            }
+
+            header('Location: index.php?ctrl=user&action=planning');
+            exit();
+        }
     }
 }

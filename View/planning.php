@@ -1,4 +1,4 @@
-<form method="post" action="planning_handler.php">
+<form method="POST" action="index.php?ctrl=user&action=updateEvent">
     <table border="1" class="events-table">
         <thead>
             <tr>
@@ -10,8 +10,6 @@
         <tbody>
             <?php foreach ($events as $event):
                 $id = $event["user_id"];
-                $user = $id ? $userManager->findOne($id) : null;
-
                 $weekNumber = $event['weekNumber'] ?? null;
                 $year = $event['year'] ?? null;
 
@@ -31,15 +29,16 @@
                         <?= htmlspecialchars($event["year"] ?? 'Non spécifiée') ?>
                     </td>
                     <td>
-                        <select name="user_<?= htmlspecialchars($event->_id) ?>">
-                            <option value="" <?= $user === null ? 'selected' : '' ?>>
+                        <select name="user_<?= htmlspecialchars($event["_id"]) ?>">
+                            <option value="" <?= $id === null ? 'selected' : '' ?>>
                                 Aucun utilisateur
                             </option>
-                            <?php if ($user): ?>
-                                <option value="<?= htmlspecialchars($user->getId()) ?>" selected>
+                            <?php foreach ($users as $user): ?>
+                                <option value="<?= htmlspecialchars($user->getId()) ?>"
+                                    <?= (string)$user->getId() === (string)$id ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($user->getLastName()) ?>
                                 </option>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </select>
                     </td>
                 </tr>

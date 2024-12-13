@@ -65,4 +65,17 @@ class EventManager
         $bulk->insert($missingEvent);
         $this->db->executeBulkWrite($this->eventCollection, $bulk);
     }
+
+    public function updateEventUser(string $eventId, ?string $userId)
+    {
+        $bulk = new MongoDB\Driver\BulkWrite();
+
+        $filter = ['_id' => new MongoDB\BSON\ObjectId($eventId)];
+
+        $update = ['$set' => ['user_id' => $userId ? new MongoDB\BSON\ObjectId($userId) : null]];
+
+        $bulk->update($filter, $update);
+
+        $this->db->executeBulkWrite($this->eventCollection, $bulk);
+    }
 }
